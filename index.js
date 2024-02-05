@@ -13,7 +13,7 @@ app.use(express.json())
 
 //3. Rutas
 // app.use('/usuario', userRoutes)
-// app.use('/chat', chatRoutes)
+app.use('/chat', chatRoutes)
 app.get('/', (req, res) => res.send('VSI CHATBOT API'))
 
 // 4. SERVIDOR
