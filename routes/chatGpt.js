@@ -4,7 +4,7 @@ const app = express.Router();
 // const bcryptjs = require("bcryptjs");
 
 app.get("/gpt", async (req, res) => {
-    res.json({ msg: "Hello" });
+    res.send("VSI Chatbot API");
 });
 
 // app.post("/gpt", async (req, res) => {
