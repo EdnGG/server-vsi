@@ -10,8 +10,8 @@ app.use(cors())
 app.use(express.json())
 
 //3. Rutas
-app.use('/chat', chatRoutes)
 app.get('/', (req, res) => res.send('VSI CHATBOT API'))
+app.use('/assistant', chatRoutes)
 
 // 4. SERVIDOR
 app.listen(process.env.PORT, () => {
