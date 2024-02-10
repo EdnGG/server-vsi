@@ -18,5 +18,5 @@ app.get('/', (req, res) => res.send('VSI CHATBOT API'))
 
 // 4. SERVIDOR
 app.listen(process.env.PORT, () => {
-	console.log('El servidor está corriendo en 3000')
+	console.log(`El servidor está corriendo en ${process.env.PORT}`)
 })

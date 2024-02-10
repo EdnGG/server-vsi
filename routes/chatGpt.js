@@ -25,3 +25,5 @@ app.get("/gpt", async (req, res) => {
 //         res.status(500).json({ msg: "Hubo un error obteniendo los datos" });
 //     }
 // })
+
+module.exports = app; // Exportar la ruta
