@@ -1,5 +1,5 @@
 const express = require('express')
-const serverlees = require('serverless-http')
+const serverless = require('serverless-http')
 const cors = require('cors')
 const chatRoutes = require('./routes/chatGpt')
 
