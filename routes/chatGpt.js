@@ -9,6 +9,7 @@ app.get("/chatbot-vsi", async (req, res) => {
 
 app.post("/chatbot-vsi", async (req, res) => {
     const { message } = req.body; // Obtener el mensaje de la petición
+    console.log('message form backend ' , message)
     const { OpenAI } = require("openai");
 
     // Configuración del cliente de OpenAI
@@ -19,9 +20,8 @@ app.post("/chatbot-vsi", async (req, res) => {
 
     try {
         const response = await openai.chat.completions.create({
-            model: "gpt-3.5-turbo", // Cambia esto por el modelo que quieras usar
-            // prompt: message,
-            max_tokens: 150,
+            model: "gpt-4-turbo-preview", // Cambia esto por el modelo que quieras usar
+            max_tokens: 300,
             temperature: 0.7,
             top_p: 1,
             frequency_penalty: 0,
@@ -31,6 +31,7 @@ app.post("/chatbot-vsi", async (req, res) => {
                 content: message
             }],
         });
+        // console.log('response from openai', response.choices[0].message.content)
         res.json({ response: response.choices[0].message.content}); // Asegúrate de enviar solo la data que necesitas
     } catch (error) {
         console.error(error); // Loguear el error puede ayudarte a debuggear
