@@ -56,34 +56,33 @@ app.post("/vsi-bot", async (req, resp) => {
     const getAssistant = await openai.beta.assistants.retrieve(
       "asst_Wu03gXjfzLtPJNS3bWv4FmLo"
     );
-    // console.log("Assistant: ", getAssistant);
-    // console.log("Assistant Id: ", getAssistant.id);
 
     // Create a Thread
-    // const thread = await openai.beta.threads.create();
-    // console.log('Thread: ', thread)
+    const thread = await openai.beta.threads.create();
+    console.log('Thread: ', thread)
 
     // Create a Message
-    // const mensaje = await openai.beta.threads.messages.create(thread.id, {
-    //   role: "user",
-    //   content: message,
-    // });
-    // console.log("Mensaje: ", mensaje);
+    const mensaje = await openai.beta.threads.messages.create(thread.id, {
+      role: "user",
+      content: message,
+    });
+    console.log("Mensaje: ", mensaje);
 
     // Create a Run
-    // const run = await openai.beta.threads.runs.create(thread.id, {
-    //     assistant_id: getAssistant.id,
-    //     instructions: "Address the user as Technical"
-    // })
-    // console.log('Run : ', run)
+    const run = await openai.beta.threads.runs.create(thread.id, {
+        assistant_id: getAssistant.id,
+        instructions: "Address the user as Technical"
+    })
+    console.log('Run : ', run)
 
-    // const run  = await openai.beta.threads.runs.retrieve(
-    //     'thread_ZFs9CoBxOwlaWwfATdeYjEQ8','run_87uW84wSddVkfimmd6lvNqXL'
-    // )
-    // console.log('Run 2: ', run)
+    // AQUI ESTA EL TRUCO
+    const run2  = await openai.beta.threads.runs.retrieve(
+        thread.id,run.id
+    )
+    console.log('Run 2: ', run2)
 
 
-    const messages = await openai.beta.threads.messages.list('thread_ZFs9CoBxOwlaWwfATdeYjEQ8')
+    const messages = await openai.beta.threads.messages.list(thread.id)
     console.log('Messages: ', messages)
 
     messages.body.data.forEach(message => {
