@@ -54,7 +54,7 @@ app.post("/vsi-bot", async (req, resp) => {
         });
       }
 
-      await new Promise((r) => setTimeout(r, 30000));
+      await new Promise((r) => setTimeout(r, 50000));
       checks++;
     }
 
