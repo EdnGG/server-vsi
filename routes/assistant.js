@@ -54,14 +54,14 @@ app.post("/vsi-bot", async (req, resp) => {
         });
       }
 
-      await new Promise((r) => setTimeout(r, 50000));
+      await new Promise((r) => setTimeout(r, 30000));
       checks++;
     }
 
     // Si se sale del bucle sin completar o fallar
     return resp.status(504).json({ response: "Request timed out." });
   } catch (error) {
-    console.error(error);
+    console.error(error.message);
     resp.status(500).json({ msg: "There was an error getting the data" });
   }
 });
