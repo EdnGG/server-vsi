@@ -24,12 +24,12 @@ app.post("/vsi-bot", async (req, resp) => {
 
     const run = await openai.beta.threads.runs.create(thread.id, {
       assistant_id: "asst_Wu03gXjfzLtPJNS3bWv4FmLo",
-      instructions: "Please address the user as VSI-Technical",
+      instructions: "You are a VSI ASSISTANT  that gives information about all products and services we provide to all application needs. Please address the user as VSI-Technical. If user ask about whats the right steps to assemble any assembly? you need to take a look in your knowledge, specifically on file 'assemblies.json' ",
     });
     console.log("Primer run: ", run);
 
     let checks = 0;
-    while (checks < 5) {
+    while (checks < 6) {
       const runCheck = await openai.beta.threads.runs.retrieve(
         thread.id,
         run.id
@@ -48,13 +48,14 @@ app.post("/vsi-bot", async (req, resp) => {
           }
         }
         // Manejo del caso "failed" o no hay mensajes de respuesta
+        console.log("runCheck.status : " ,runCheck.status);
         return resp.json({
           response:
             "There was an issue processing your request. Please try again.",
         });
       }
 
-      await new Promise((r) => setTimeout(r, 50000));
+      await new Promise((r) => setTimeout(r, 35000));
       checks++;
     }
 
