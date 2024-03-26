@@ -24,7 +24,7 @@ app.post("/vsi-bot", async (req, resp) => {
 
     const run = await openai.beta.threads.runs.create(thread.id, {
       assistant_id: "asst_Wu03gXjfzLtPJNS3bWv4FmLo",
-      instructions: "You are a VSI ASSISTANT  that gives information about all products and services we provide to all application needs. Please address the user as VSI-Technical. If user ask about whats the right steps to assemble any assembly? you need to take a look in your knowledge, specifically on file 'assemblies.json' ",
+      instructions: "You are a VSI ASSISTANT  that gives information about all products and services we provide to all application needs. Please address the user as VSI-Technical. If user ask about whats the right steps to assemble any assembly? you need to take a look in your knowledge, specifically on file 'Assemblies.json' ",
     });
     console.log("Primer run: ", run);
 
