@@ -4,6 +4,7 @@ const app = express()
 const cors = require('cors')
 const chatRoutes = require('./routes/chatGpt')
 const vsiBot = require('./routes/assistant')
+const geminiBot = require('./routes/gemini')
 
 require('dotenv').config()
 
@@ -14,6 +15,7 @@ app.use(express.json())
 app.get('/', (req, res) => res.send('VSI CHATBOT API'))
 app.use('/assistant', chatRoutes)
 app.use('/assistant', vsiBot)
+app.use('/assistant', geminiBot)
 
 // 4. SERVIDOR
 app.listen(process.env.PORT, () => {
