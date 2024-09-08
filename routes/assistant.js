@@ -3,67 +3,86 @@ const express = require("express");
 const app = express.Router();
 const { OpenAI } = require("openai");
 
-app.post("/vsi-bot", async (req, resp) => {
-  const { message } = req.body;
+const getOpenAIClient = () => {
 
   const configuration = {
     apiKey: process.env.OPENAI_API_KEY,
-    organization: "org-Qkz6gVwmS9m4Q8v1OtZDbWRV",
+    organization: process.env.OPENAI_ORG,
   };
-  const openai = new OpenAI(configuration);
+  return new OpenAI(configuration);
+}
+
+const checkRunStatus = async (openai, threadId, runId) => {
+  let checks = 0;
+  while(checks < 6){
+    try{
+      const runCheck = await openai.beta.threads.runs.retrieve(threadId, runId)
+      if(runCheck.status === "completed" ||runCheck.status === "failed"){
+        return runCheck
+      }
+      await new Promise((r) => setTimeout(r, 15000))
+      checks++
+    }catch(error){
+      console.error(`Error checking run status: ${error.message}`)
+      throw new Error("Failed to check run status")
+    }
+  }
+  throw new Error("Request timed out after multiple checks")
+}
+
+const getAssistantMessages = async (openai, threadId, runId) => {
+  try{
+    const messages = await openai.beta.threads.messages.list(threadId)
+    const runMessages = messages.data.filter((m) => m.run_id === runId)
+    if(runMessages.length > 0 ){
+      return runMessages[0].content[0].text.value
+    }
+    throw new Error("No response messages found")
+
+  } catch(error){
+    console.error(`Error retrieving messages: ${error.message}`)
+    throw new Error("Failed to retrieve messages")
+  }
+}
+  
+
+app.post("/vsi-bot", async (req, resp) => {
+
+  const { message } = req.body;
+
+  if(!message || typeof message!== "string"){
+    return resp.status(400).json({response: "Invalid input message provided"})
+  }
+
+  const openai = getOpenAIClient()
 
   try {
     const thread = await openai.beta.threads.create({
-      messages: [
-        {
-          role: "user",
-          content: message,
-        },
-      ],
-    });
-
+      messages: [{role: "user", content: message}]
+    })
+    
+    // Crear la primera ejecución del asistente
     const run = await openai.beta.threads.runs.create(thread.id, {
       assistant_id: "asst_Wu03gXjfzLtPJNS3bWv4FmLo",
       instructions: "You are a VSI ASSISTANT  that gives information about all products and services we provide to all application needs. Please address the user as VSI-Technical. If user ask about whats the right steps to assemble any assembly? you need to take a look in your knowledge, specifically on file 'Assemblies.json' ",
     });
-    console.log("Primer run: ", run);
 
-    let checks = 0;
-    while (checks < 6) {
-      const runCheck = await openai.beta.threads.runs.retrieve(
-        thread.id,
-        run.id
-      );
-      console.log("Run Check: ", runCheck.status);
+    console.log("First run: ", run)
 
-      if (runCheck.status === "completed" || runCheck.status === "failed") {
-        if (runCheck.status === "completed") {
-          const messages = await openai.beta.threads.messages.list(thread.id);
-          console.log("Messages: ", messages);
-          const runMessages = messages.data.filter((m) => m.run_id === run.id);
-          if (runMessages.length > 0) {
-            const answer = runMessages[0].content[0].text.value;
-            console.log("Answer: ", answer);
-            return resp.json({ response: answer });
-          }
-        }
-        // Manejo del caso "failed" o no hay mensajes de respuesta
-        console.log("runCheck.status : " ,runCheck.status);
-        return resp.json({
-          response:
-            "There was an issue processing your request. Please try again.",
-        });
-      }
-
-      await new Promise((r) => setTimeout(r, 60000));
-      checks++;
+    const runCheck = await checkRunStatus(openai, thread.id, run.id)
+    if(runCheck.status === "completed"){
+      const answer = await getAssistantMessages(openai, thread.id, run.id)
+      return resp.json({response: answer})
     }
+    // Manejo del caso "failed" o sin respuesta
+    return resp.json({
+      response: "There was an issue processing your request. Please try again.",
+    });
 
-    // Si se sale del bucle sin completar o fallar
-    return resp.status(504).json({ response: "Request timed out." });
+
   } catch (error) {
-    console.error(error.message);
-    resp.status(500).json({ msg: "There was an error getting the data" });
+    console.error(`Error processing request: ${error.message}`);
+    resp.status(500).json({ msg: "There was an error processing your request." });
   }
 });
 
